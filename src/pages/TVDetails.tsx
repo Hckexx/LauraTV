@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchTVDetails, fetchTVCredits, fetchSimilarTVShows, fetchTVVideos } from '../lib/api'
 import { getBackdropUrl, getPosterUrl } from '../lib/api'
 import MediaGrid from '../components/media/MediaGrid'
+import WatchlistButton from '../components/media/WatchlistButton'
 
 function TVDetails() {
   const { id } = useParams<{ id: string }>()
@@ -138,6 +139,14 @@ function TVDetails() {
                   </svg>
                   Watch Now
                 </Link>
+                                <WatchlistButton
+                  id={show.id}
+                  mediaType="tv"
+                  title={show.name}
+                  posterPath={show.poster_path}
+                  rating={show.vote_average}
+                  year={show.first_air_date?.slice(0, 4)}
+                />
 
                 {trailer?.key && (
                   <a

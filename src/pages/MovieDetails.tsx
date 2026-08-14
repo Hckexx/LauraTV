@@ -1,8 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { fetchMovieDetails, fetchMovieCredits, fetchSimilarMovies, fetchMovieVideos } from '../lib/api'
-import { getBackdropUrl, getPosterUrl } from '../lib/api'
+import { fetchMovieDetails, fetchMovieCredits, fetchSimilarMovies, fetchMovieVideos, getTrailerKey } from '../lib/api'
+import { getPosterUrl } from '../lib/api'
 import MediaGrid from '../components/media/MediaGrid'
+import WatchlistButton from '../components/media/WatchlistButton'
 
 function MovieDetails() {
   const { id } = useParams<{ id: string }>()
@@ -52,11 +53,13 @@ function MovieDetails() {
     )
   }
 
-  const backdropUrl = getBackdropUrl(movie.backdrop_path)
+  const backdropUrl = movie.backdrop_path
+    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+    : null
   const posterUrl = getPosterUrl(movie.poster_path)
   const cast = credits?.cast?.slice(0, 12) || []
   const similarMovies = Array.isArray(similar) ? similar : similar?.results || []
-  const trailer = videos?.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube') || videos?.[0]
+  const trailerKey = getTrailerKey(videos)
 
   return (
     <div className="min-h-screen">
@@ -92,12 +95,10 @@ function MovieDetails() {
                 {movie.title}
               </h1>
 
-              {/* Tagline */}
               {movie.tagline && (
                 <p className="text-gray-400 italic mb-3">{movie.tagline}</p>
               )}
 
-              {/* Metadata */}
               <div className="flex flex-wrap items-center gap-4 mb-4">
                 {movie.vote_average > 0 && (
                   <span className="text-yellow-400 font-semibold">
@@ -120,15 +121,13 @@ function MovieDetails() {
                 ))}
               </div>
 
-              {/* Overview */}
               {movie.overview && (
                 <p className="text-gray-300 text-base sm:text-lg mb-6 max-w-3xl leading-relaxed">
                   {movie.overview}
                 </p>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4">
+                            <div className="flex flex-wrap gap-4">
                 <Link
                   to={`/watch/${movie.id}?type=movie`}
                   className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
@@ -139,9 +138,18 @@ function MovieDetails() {
                   Watch Now
                 </Link>
 
-                {trailer?.key && (
+                <WatchlistButton
+                  id={movie.id}
+                  mediaType="movie"
+                  title={movie.title}
+                  posterPath={movie.poster_path}
+                  rating={movie.vote_average}
+                  year={movie.release_date?.slice(0, 4)}
+                />
+
+                {trailerKey && (
                   <a
-                    href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                    href={`https://www.youtube.com/watch?v=${trailerKey}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
@@ -150,7 +158,7 @@ function MovieDetails() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Trailer
+                    Watch Trailer
                   </a>
                 )}
               </div>

@@ -7,6 +7,7 @@ const navLinks = [
   { path: '/discover', label: 'Discover' },
   { path: '/movies', label: 'Movies' },
   { path: '/tv-shows', label: 'TV Shows' },
+  { path: '/watchlist', label: 'Watchlist' },
   { path: '/search', label: 'Search' },
 ]
 

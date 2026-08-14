@@ -201,3 +201,16 @@ export async function searchEpisodes(query: string) {
   const data = await fetchFromAPI(`/search/episode?query=${encodeURIComponent(query)}`)
   return data.data || data.results || []
 }
+
+// Get the best trailer key from videos array
+export function getTrailerKey(videos: any[]) {
+  if (!videos || videos.length === 0) return null
+  
+  return (
+    videos.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube' && v.official)?.key ||
+    videos.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube')?.key ||
+    videos.find((v: any) => v.type === 'Teaser' && v.site === 'YouTube' && v.official)?.key ||
+    videos.find((v: any) => v.site === 'YouTube')?.key ||
+    null
+  )
+}
